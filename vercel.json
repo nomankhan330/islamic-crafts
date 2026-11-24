@@ -9,12 +9,32 @@
   },
   "routes": [
     {
-      "src": "/(images|css|js|favicon.ico|robots.txt)(.*)",
-      "dest": "/public/$1$2"
+      "src": "/images/(.*)",
+      "dest": "/public/images/$1"
+    },
+    {
+      "src": "/css/(.*)",
+      "dest": "/public/css/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/public/js/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
     },
     {
       "src": "/storage/(.*)",
       "dest": "/public/storage/$1"
+    },
+    {
+      "src": "/(.*\\.(ico|jpg|jpeg|png|gif|svg|css|js|woff|woff2|ttf|eot|webp))",
+      "dest": "/public/$1"
     },
     {
       "src": "/(.*)",
@@ -24,7 +44,7 @@
   "env": {
     "APP_NAME": "Islamic Crafts",
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
+    "APP_DEBUG": "false",
     "APP_KEY": "base64:UMUasHEZAWgFMEUg1j60HGEdacIcrIdehrQG9EKKYZQ=",
     "APP_SERVICES_CACHE": "/tmp/services.php",
     "APP_PACKAGES_CACHE": "/tmp/packages.php",
