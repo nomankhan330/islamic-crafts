@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CustomOrderController as AdminCustomOrderController;
 use App\Http\Controllers\Admin\OccasionController as AdminOccasionController;
 use App\Http\Controllers\Admin\LookbookController as AdminLookbookController;
+use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Admin\SettingController as AdminSettingController;
+use App\Models\Product;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SubscriberController as AdminSubscriberController;
 use App\Models\Subscriber;
@@ -41,10 +44,30 @@ Route::post('/cart/update/{key}', [CartController::class, 'update'])->name('cart
 Route::delete('/cart/remove/{key}', [CartController::class, 'remove'])->name('cart.remove');
 Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
 
-// Checkout
+// Checkout & Order Tracking
 Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+Route::post('/checkout/apply-coupon', [OrderController::class, 'applyCoupon'])->name('checkout.apply-coupon');
 Route::post('/checkout/place', [OrderController::class, 'placeOrder'])->name('order.place');
 Route::get('/order/success/{order}', [OrderController::class, 'success'])->name('order.success');
+Route::get('/track-order', [OrderController::class, 'track'])->name('orders.track');
+
+// Wishlist Products Lookup API (for Saved Favorites Drawer)
+Route::get('/wishlist/items', function (Request $request) {
+    $ids = array_filter(array_map('intval', explode(',', (string) $request->get('ids', ''))));
+    if (empty($ids)) {
+        return response()->json(['items' => []]);
+    }
+    $products = Product::active()->with('images')->whereIn('id', $ids)->get()->map(function ($p) {
+        return [
+            'id' => $p->id,
+            'name' => $p->name,
+            'price' => 'Rs. ' . number_format($p->current_price, 0),
+            'image' => $p->primary_image_url,
+            'url' => route('products.show', $p->slug),
+        ];
+    });
+    return response()->json(['items' => $products]);
+})->name('wishlist.items');
 
 // Custom Orders
 Route::get('/custom-orders', [CustomOrderController::class, 'index'])->name('custom-orders');
@@ -104,6 +127,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');
     Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
 
@@ -136,4 +160,14 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::put('/lookbook/{lookbookItem}', [AdminLookbookController::class, 'update'])->name('lookbook.update');
     Route::post('/lookbook/{lookbookItem}/toggle-active', [AdminLookbookController::class, 'toggleActive'])->name('lookbook.toggle-active');
     Route::delete('/lookbook/{lookbookItem}', [AdminLookbookController::class, 'destroy'])->name('lookbook.destroy');
+
+    // Promo Codes / Coupons Management
+    Route::get('/coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
+    Route::post('/coupons', [AdminCouponController::class, 'store'])->name('coupons.store');
+    Route::post('/coupons/{coupon}/toggle-active', [AdminCouponController::class, 'toggleActive'])->name('coupons.toggle-active');
+    Route::delete('/coupons/{coupon}', [AdminCouponController::class, 'destroy'])->name('coupons.destroy');
+
+    // Storefront Settings
+    Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
 });

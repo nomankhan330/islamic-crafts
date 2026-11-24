@@ -700,6 +700,7 @@
                     }
                 }
                 try { localStorage.setItem('ic_wishlist', JSON.stringify(savedWishlist)); } catch (err) {}
+                if (typeof window.syncWishlistBadge === 'function') window.syncWishlistBadge();
             });
         });
 

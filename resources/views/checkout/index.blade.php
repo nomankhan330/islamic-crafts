@@ -319,6 +319,24 @@
                     @endforeach
                 </div>
 
+                <!-- Promo Code Box -->
+                <div class="pt-4 border-t border-[#E8DACB]">
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#7A5638] mb-2">Have a Promo Code? (e.g. CRAFTY10)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text"
+                               id="checkout-coupon-input"
+                               placeholder="Enter code (CRAFTY10)"
+                               class="flex-grow bg-[#FBF6EE] border border-[#DFCBB7] focus:border-[#6B4B32] rounded-xl px-3.5 py-2 text-xs uppercase font-mono text-[#4A2F17] outline-none">
+                        <button type="button"
+                                id="checkout-coupon-apply-btn"
+                                class="px-4 py-2 rounded-xl bg-[#6B4B32] hover:bg-[#573C27] text-white text-xs font-semibold transition-colors cursor-pointer">
+                            Apply
+                        </button>
+                    </div>
+                    <input type="hidden" name="coupon_code" id="checkout-coupon-hidden" value="">
+                    <p id="checkout-coupon-msg" class="text-[11px] mt-1.5 hidden"></p>
+                </div>
+
                 <!-- Price Totals Breakdown -->
                 <div class="pt-4 border-t border-[#E8DACB] space-y-3 text-xs text-[#6F4B2E]">
                     <div class="flex justify-between items-center">
@@ -326,6 +344,11 @@
                         <span class="font-semibold text-sm text-[#4A2F17]">
                             Rs. {{ number_format($total, 0) }}
                         </span>
+                    </div>
+
+                    <div id="checkout-discount-row" class="hidden justify-between items-center text-emerald-700 font-semibold">
+                        <span>Promo Discount (<span id="checkout-discount-code"></span>)</span>
+                        <span id="checkout-discount-amount">- Rs. 0</span>
                     </div>
 
                     <div class="flex justify-between items-center">
@@ -352,11 +375,71 @@
                             </span>
                             <span class="text-[10px] text-[#8A6749]">Payable upon delivery / confirmation</span>
                         </div>
-                        <span class="font-serif-lux text-2xl sm:text-3xl text-[#52351E] font-bold">
+                        <span id="checkout-grand-total" class="font-serif-lux text-2xl sm:text-3xl text-[#52351E] font-bold">
                             Rs. {{ number_format($total, 0) }}
                         </span>
                     </div>
                 </div>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const applyBtn = document.getElementById('checkout-coupon-apply-btn');
+                    const input = document.getElementById('checkout-coupon-input');
+                    const hidden = document.getElementById('checkout-coupon-hidden');
+                    const msg = document.getElementById('checkout-coupon-msg');
+                    const discountRow = document.getElementById('checkout-discount-row');
+                    const discountCode = document.getElementById('checkout-discount-code');
+                    const discountAmt = document.getElementById('checkout-discount-amount');
+                    const grandTotal = document.getElementById('checkout-grand-total');
+
+                    if (!applyBtn) return;
+
+                    applyBtn.addEventListener('click', function () {
+                        const code = (input.value || '').trim();
+                        if (!code) return;
+
+                        applyBtn.disabled = true;
+                        applyBtn.textContent = '...';
+
+                        fetch("{{ route('checkout.apply-coupon') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                            },
+                            body: JSON.stringify({ code })
+                        })
+                        .then(async res => ({ ok: res.ok, data: await res.json() }))
+                        .then(({ ok, data }) => {
+                            applyBtn.disabled = false;
+                            applyBtn.textContent = 'Apply';
+                            msg.classList.remove('hidden', 'text-emerald-700', 'text-rose-600');
+
+                            if (ok && data.success) {
+                                hidden.value = data.code;
+                                msg.classList.add('text-emerald-700', 'font-semibold');
+                                msg.textContent = '✓ ' + data.message;
+                                discountCode.textContent = data.code;
+                                discountAmt.textContent = '- Rs. ' + Number(data.discount).toLocaleString();
+                                discountRow.classList.remove('hidden');
+                                discountRow.classList.add('flex');
+                                grandTotal.textContent = 'Rs. ' + Number(data.final_total).toLocaleString();
+                            } else {
+                                hidden.value = '';
+                                msg.classList.add('text-rose-600');
+                                msg.textContent = data.message || 'Invalid promo code.';
+                                discountRow.classList.add('hidden');
+                                discountRow.classList.remove('flex');
+                            }
+                        })
+                        .catch(() => {
+                            applyBtn.disabled = false;
+                            applyBtn.textContent = 'Apply';
+                        });
+                    });
+                });
+                </script>
 
                 <!-- Submission Actions -->
                 <div class="space-y-3 pt-2">

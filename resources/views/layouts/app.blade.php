@@ -160,12 +160,13 @@
                     </div>
 
                     <a href="{{ route('custom-orders') }}" class="transition-colors hover:text-[#8F6644] {{ request()->routeIs('custom-orders') ? 'border-b border-[#7D5838] pb-1' : '' }}">Custom Orders</a>
+                    <a href="{{ route('orders.track') }}" class="transition-colors hover:text-[#8F6644] {{ request()->routeIs('orders.track') ? 'border-b border-[#7D5838] pb-1' : '' }}">Track Order</a>
                     <a href="{{ route('about') }}" class="transition-colors hover:text-[#8F6644] {{ request()->routeIs('about') ? 'border-b border-[#7D5838] pb-1' : '' }}">About Us</a>
                     <a href="{{ route('contact') }}" class="transition-colors hover:text-[#8F6644] {{ request()->routeIs('contact') ? 'border-b border-[#7D5838] pb-1' : '' }}">Contact Us</a>
                 </nav>
 
-                <!-- Action Icons (Search, User, Cart) - Exactly as in Screenshot -->
-                <div class="flex items-center space-x-4 sm:space-x-5 text-[#5C3D24]">
+                <!-- Action Icons (Search, Wishlist, User, Cart) -->
+                <div class="flex items-center space-x-3.5 sm:space-x-5 text-[#5C3D24]">
                     <!-- Search Icon -->
                     <a href="{{ route('products.index') }}" class="hover:text-[#8F6644] transition-colors p-1" title="Search">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
@@ -173,6 +174,14 @@
                             <path stroke-linecap="round" d="M20 20l-3.5-3.5"/>
                         </svg>
                     </a>
+
+                    <!-- Saved Favorites / Wishlist Drawer Trigger -->
+                    <button type="button" id="open-wishlist-drawer-btn" class="relative hover:text-rose-500 transition-colors p-1 cursor-pointer" title="Saved Favorites">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <span id="nav-wishlist-count" class="hidden absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold w-4 h-4 rounded-full items-center justify-center">0</span>
+                    </button>
 
                     <!-- User Account / Admin Access Icon -->
                     <a href="{{ auth()->check() ? route('admin.dashboard') : route('admin.login') }}" class="hover:text-[#8F6644] transition-colors p-1" title="{{ auth()->check() ? 'Admin Dashboard' : 'Admin Login' }}">
@@ -204,6 +213,7 @@
             <a href="{{ route('home') }}" class="block font-medium py-1">Home</a>
             <a href="{{ route('products.index') }}" class="block font-medium py-1">Shop All</a>
             <a href="{{ route('custom-orders') }}" class="block font-medium py-1">Custom Orders</a>
+            <a href="{{ route('orders.track') }}" class="block font-medium py-1">Track Order</a>
             <a href="{{ route('about') }}" class="block font-medium py-1">About Us</a>
             <a href="{{ route('contact') }}" class="block font-medium py-1">Contact Us</a>
             <a href="{{ route('admin.dashboard') }}" class="block font-medium py-1 text-[#6B4B32] border-t border-[#E8DACB] pt-2">Admin Panel</a>
@@ -851,9 +861,113 @@
         })();
     </script>
 
+    <!-- Saved Favorites / Wishlist Slide-over Drawer -->
+    <div id="wishlist-drawer-overlay" class="fixed inset-0 z-50 hidden bg-[#2A180A]/55 backdrop-blur-xs">
+        <div class="fixed inset-y-0 right-0 w-full max-w-sm bg-[#FAF4ED] border-l border-[#DFCBB7] shadow-2xl flex flex-col">
+            <div class="p-5 border-b border-[#EADBCC] flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9A714C] block">Your Collection</span>
+                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium">Saved Favorites ♡</h3>
+                </div>
+                <button type="button" id="close-wishlist-drawer-btn" class="w-8 h-8 rounded-full bg-[#F3E7D9] hover:bg-[#6B4B32] text-[#58381C] hover:text-white flex items-center justify-center text-lg transition-colors cursor-pointer">×</button>
+            </div>
+
+            <div id="wishlist-drawer-body" class="flex-grow overflow-y-auto p-5 space-y-3">
+                <p class="text-xs text-[#8A6749] text-center py-10">Loading your saved favorites...</p>
+            </div>
+
+            <div class="p-4 border-t border-[#EADBCC] bg-[#F5ECE1]/60">
+                <a href="{{ route('products.index') }}" class="w-full btn-luxury py-3 rounded-full text-xs font-semibold text-center block">
+                    Explore More Handcrafted Pieces →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        const openBtn = document.getElementById('open-wishlist-drawer-btn');
+        const closeBtn = document.getElementById('close-wishlist-drawer-btn');
+        const overlay = document.getElementById('wishlist-drawer-overlay');
+        const body = document.getElementById('wishlist-drawer-body');
+        const badge = document.getElementById('nav-wishlist-count');
+
+        function getWishlistIds() {
+            try { return JSON.parse(localStorage.getItem('ic_wishlist') || '[]'); } catch (e) { return []; }
+        }
+
+        function syncWishlistBadge() {
+            const ids = getWishlistIds();
+            if (!badge) return;
+            if (ids.length > 0) {
+                badge.textContent = ids.length;
+                badge.classList.remove('hidden');
+                badge.classList.add('flex');
+            } else {
+                badge.classList.add('hidden');
+                badge.classList.remove('flex');
+            }
+        }
+
+        window.syncWishlistBadge = syncWishlistBadge;
+        syncWishlistBadge();
+        window.addEventListener('storage', syncWishlistBadge);
+
+        function renderWishlistDrawer() {
+            const ids = getWishlistIds();
+            if (!ids.length) {
+                body.innerHTML = `<div class="text-center py-12"><span class="text-3xl block mb-2">🤍</span><p class="font-serif-lux text-xl text-[#4A2D16] mb-1">No favorites saved yet</p><p class="text-xs text-[#8A6749]">Tap the heart icon on any handcrafted piece to save it here.</p></div>`;
+                return;
+            }
+            body.innerHTML = `<p class="text-xs text-[#8A6749] text-center py-8">Loading your favorites...</p>`;
+            fetch("{{ route('wishlist.items') }}?ids=" + encodeURIComponent(ids.join(',')))
+                .then(res => res.json())
+                .then(data => {
+                    const items = data.items || [];
+                    if (!items.length) {
+                        body.innerHTML = `<div class="text-center py-12 text-xs text-[#8A6749]">No favorites available right now.</div>`;
+                        return;
+                    }
+                    body.innerHTML = items.map(item => `
+                        <div class="flex items-center space-x-3 p-3 rounded-2xl bg-[#FBF6EE] border border-[#E5D4C1]">
+                            <a href="${item.url}" class="w-14 h-14 rounded-xl bg-[#F0E3D3] overflow-hidden flex-shrink-0 block">
+                                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center">✨</div>`}
+                            </a>
+                            <div class="flex-grow min-w-0">
+                                <a href="${item.url}" class="font-serif-lux text-base font-semibold text-[#4A2D16] truncate block hover:underline">${item.name}</a>
+                                <p class="text-xs font-bold text-[#6B4B32]">${item.price}</p>
+                            </div>
+                            <button type="button" onclick="removeWishlistItem('${item.id}')" class="text-xs text-rose-500 hover:text-rose-700 px-2 py-1 cursor-pointer" title="Remove">✕</button>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        window.removeWishlistItem = function (id) {
+            const ids = getWishlistIds().filter(x => String(x) !== String(id));
+            localStorage.setItem('ic_wishlist', JSON.stringify(ids));
+            syncWishlistBadge();
+            renderWishlistDrawer();
+        };
+
+        if (openBtn && overlay) {
+            openBtn.addEventListener('click', () => {
+                overlay.classList.remove('hidden');
+                renderWishlistDrawer();
+            });
+        }
+        if (closeBtn && overlay) {
+            closeBtn.addEventListener('click', () => overlay.classList.add('hidden'));
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.add('hidden');
+            });
+        }
+    })();
+    </script>
+
     <!-- Global Floating WhatsApp Concierge Button -->
     @php
-        $floatingWaNum = preg_replace('/[^0-9]/', '', env('WHATSAPP_NUMBER', '923001234567'));
+        $floatingWaNum = preg_replace('/[^0-9]/', '', \App\Models\StoreSetting::getValue('whatsapp_number', env('WHATSAPP_NUMBER', '923001234567')));
     @endphp
     <div class="fixed bottom-5 right-5 z-40 group flex items-center space-x-2.5">
         <a href="https://wa.me/{{ $floatingWaNum }}?text=Assalam-o-Alaikum%20Islamic%20Crafts!%20I%20need%20help%20with%20an%20order."

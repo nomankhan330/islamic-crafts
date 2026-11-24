@@ -202,6 +202,25 @@
                         {{ \App\Models\LookbookItem::count() }}
                     </span>
                 </a>
+
+                <a href="{{ route('admin.coupons.index') }}" 
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-200 mt-1 {{ request()->routeIs('admin.coupons.*') ? 'bg-gradient-to-r from-[#6B4B32] to-[#865F40] text-white shadow-md font-semibold' : 'text-[#DECDBD] hover:bg-[#52351D] hover:text-white' }}">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm">🏷️</span>
+                        <span>Promo Codes</span>
+                    </div>
+                    <span class="text-[10px] bg-[#352010] text-[#D9C4AF] px-2 py-0.5 rounded-full font-mono">
+                        {{ \App\Models\Coupon::count() }}
+                    </span>
+                </a>
+
+                <a href="{{ route('admin.settings.index') }}" 
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-200 mt-1 {{ request()->routeIs('admin.settings.*') ? 'bg-gradient-to-r from-[#6B4B32] to-[#865F40] text-white shadow-md font-semibold' : 'text-[#DECDBD] hover:bg-[#52351D] hover:text-white' }}">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm">⚙️</span>
+                        <span>Store Settings</span>
+                    </div>
+                </a>
             </div>
 
             <!-- Storefront Live Preview Shortcut -->

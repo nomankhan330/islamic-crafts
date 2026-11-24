@@ -19,21 +19,28 @@
             </div>
         </div>
 
-        <!-- Status Change Form -->
-        <form action="{{ route('admin.orders.update-status', $order->id) }}" method="POST" class="flex items-center gap-2">
-            @csrf
-            @method('PATCH')
-            <select name="status" class="bg-[#F5ECE1] border border-[#DFCBB7] rounded-xl px-4 py-2 text-xs font-semibold text-[#432C19] outline-none">
-                <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped</option>
-                <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered</option>
-                <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-            </select>
-            <button type="submit" class="bg-[#6B4B32] hover:bg-[#573C27] text-white px-4 py-2 rounded-xl text-xs font-semibold">
-                Update Status
-            </button>
-        </form>
+        <!-- Status Change Form & Print Invoice -->
+        <div class="flex flex-wrap items-center gap-2.5">
+            <a href="{{ route('admin.orders.invoice', $order->id) }}" target="_blank" class="px-4 py-2 rounded-xl text-xs font-semibold bg-[#F3E7D9] hover:bg-[#E7D4BE] text-[#52351E] border border-[#DEC7AF] transition-colors inline-flex items-center space-x-1.5">
+                <span>🖨️</span>
+                <span>Print Invoice</span>
+            </a>
+
+            <form action="{{ route('admin.orders.update-status', $order->id) }}" method="POST" class="flex items-center gap-2">
+                @csrf
+                @method('PATCH')
+                <select name="status" class="bg-[#F5ECE1] border border-[#DFCBB7] rounded-xl px-4 py-2 text-xs font-semibold text-[#432C19] outline-none">
+                    <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                    <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped</option>
+                    <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                    <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                </select>
+                <button type="submit" class="bg-[#6B4B32] hover:bg-[#573C27] text-white px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer">
+                    Update Status
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Customer Details & Shipping Details -->
