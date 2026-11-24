@@ -65,26 +65,34 @@
 </head>
 <body class="min-h-screen flex">
 
-    <!-- Luxury Dark Espresso Sidebar -->
-    <aside class="w-64 bg-gradient-to-b from-[#382312] via-[#432A17] to-[#331E0E] text-[#FAF4ED] flex flex-col flex-shrink-0 min-h-screen border-r border-[#2C190B] shadow-lg sticky top-0 h-screen z-40">
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="admin-sidebar-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+    <!-- Luxury Dark Espresso Sidebar (Responsive Drawer on Mobile, Sticky on Desktop) -->
+    <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 -translate-x-full lg:translate-x-0 lg:sticky lg:top-0 w-64 bg-gradient-to-b from-[#382312] via-[#432A17] to-[#331E0E] text-[#FAF4ED] flex flex-col flex-shrink-0 h-screen border-r border-[#2C190B] shadow-lg transition-transform duration-300 ease-out">
         
         <!-- Brand Header with Bow Ornament -->
-        <div class="h-20 px-6 flex items-center space-x-3 border-b border-[#54361C]/80 bg-[#321E0E]/40">
-            <div class="w-10 h-10 rounded-2xl bg-[#5A3B22] border border-[#835A36] flex items-center justify-center text-[#EAC9A4] shadow-sm flex-shrink-0">
-                <svg class="w-6 h-6" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-                    <path d="M50 48 C42 36 24 24 16 34 C8 44 20 60 40 53 C46 51 49 48 50 48 Z" stroke-width="4.5" stroke-linecap="round"/>
-                    <path d="M50 48 C58 36 76 24 84 34 C92 44 80 60 60 53 C54 51 51 48 50 48 Z" stroke-width="4.5" stroke-linecap="round"/>
-                    <circle cx="50" cy="48" r="5" fill="#EAC9A4"/>
-                    <path d="M47 53 C43 68 33 82 22 90 M53 53 C57 68 67 82 78 90" stroke-width="4" stroke-linecap="round"/>
-                </svg>
+        <div class="h-20 px-5 flex items-center justify-between border-b border-[#54361C]/80 bg-[#321E0E]/40">
+            <div class="flex items-center space-x-3 overflow-hidden">
+                <div class="w-10 h-10 rounded-2xl bg-[#5A3B22] border border-[#835A36] flex items-center justify-center text-[#EAC9A4] shadow-sm flex-shrink-0">
+                    <svg class="w-6 h-6" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                        <path d="M50 48 C42 36 24 24 16 34 C8 44 20 60 40 53 C46 51 49 48 50 48 Z" stroke-width="4.5" stroke-linecap="round"/>
+                        <path d="M50 48 C58 36 76 24 84 34 C92 44 80 60 60 53 C54 51 51 48 50 48 Z" stroke-width="4.5" stroke-linecap="round"/>
+                        <circle cx="50" cy="48" r="5" fill="#EAC9A4"/>
+                        <path d="M47 53 C43 68 33 82 22 90 M53 53 C57 68 67 82 78 90" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="overflow-hidden">
+                    <span class="font-serif-lux text-xl font-medium italic text-[#FAF4ED] block leading-tight tracking-wide truncate">Islamic Crafts</span>
+                    <span class="text-[9px] tracking-widest uppercase text-[#D2BBA0] font-semibold flex items-center space-x-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
+                        <span>Admin Portal</span>
+                    </span>
+                </div>
             </div>
-            <div class="overflow-hidden">
-                <span class="font-serif-lux text-xl font-medium italic text-[#FAF4ED] block leading-tight tracking-wide truncate">Islamic Crafts</span>
-                <span class="text-[9px] tracking-widest uppercase text-[#D2BBA0] font-semibold flex items-center space-x-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
-                    <span>Admin Portal</span>
-                </span>
-            </div>
+            <button type="button" id="admin-sidebar-close" class="lg:hidden p-1.5 rounded-lg text-[#D9C4AF] hover:text-white hover:bg-[#52351D] text-lg leading-none cursor-pointer" aria-label="Close menu">
+                ×
+            </button>
         </div>
 
         <!-- Navigation Links -->
@@ -266,34 +274,42 @@
     <div class="flex-grow flex flex-col min-w-0 bg-[#F7F1E8]">
         
         <!-- Sticky Luxury Top Bar -->
-        <header class="h-20 bg-[#FAF4ED]/90 backdrop-blur-md border-b border-[#E8DACB] px-8 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
-            <div>
-                <div class="flex items-center space-x-2">
-                    <span class="text-xs text-[#B38E6A]">✦</span>
-                    <h1 class="font-serif-lux text-2xl font-semibold text-[#4A2F17]">
-                        @yield('header_title', 'Dashboard')
-                    </h1>
+        <header class="h-20 bg-[#FAF4ED]/90 backdrop-blur-md border-b border-[#E8DACB] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sticky top-0 z-30 shadow-2xs">
+            <div class="flex items-center space-x-3 min-w-0">
+                <button type="button" id="admin-sidebar-open" class="lg:hidden p-2 rounded-xl bg-[#F3E7D9] border border-[#E0D0BE] text-[#4A2F17] hover:bg-[#E7D4BE] transition-colors flex-shrink-0 cursor-pointer" aria-label="Open menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <div class="min-w-0">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-[#B38E6A] hidden sm:inline">✦</span>
+                        <h1 class="font-serif-lux text-xl sm:text-2xl font-semibold text-[#4A2F17] truncate">
+                            @yield('header_title', 'Dashboard')
+                        </h1>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] text-[#8A6749] truncate">Islamic Crafts Luxury Management Suite</p>
                 </div>
-                <p class="text-[11px] text-[#8A6749]">Islamic Crafts Luxury Management Suite</p>
             </div>
             
-            <div class="flex items-center space-x-3.5">
+            <div class="flex items-center space-x-2.5 sm:space-x-3.5 flex-shrink-0">
                 <!-- Date Pill -->
-                <span class="hidden sm:inline-flex items-center space-x-1.5 text-xs text-[#6B4B32] bg-[#F3E7D9] border border-[#E0D0BE] px-3.5 py-1.5 rounded-full font-medium shadow-2xs">
+                <span class="hidden md:inline-flex items-center space-x-1.5 text-xs text-[#6B4B32] bg-[#F3E7D9] border border-[#E0D0BE] px-3.5 py-1.5 rounded-full font-medium shadow-2xs">
                     <span>📅</span>
                     <span>{{ now()->format('l, d M Y') }}</span>
                 </span>
 
                 <!-- Quick Add Product Action -->
-                <a href="{{ route('admin.products.create') }}" class="btn-luxury px-4 py-2 rounded-xl text-xs font-semibold tracking-wide inline-flex items-center space-x-1.5 shadow-sm hover:shadow-md transition-all">
+                <a href="{{ route('admin.products.create') }}" class="btn-luxury px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold tracking-wide inline-flex items-center space-x-1.5 shadow-sm hover:shadow-md transition-all">
                     <span>+</span>
-                    <span>Add New Product</span>
+                    <span class="hidden sm:inline">Add New Product</span>
+                    <span class="sm:hidden">New</span>
                 </a>
             </div>
         </header>
 
         <!-- Flash Messages -->
-        <div class="px-8 pt-6 pb-0">
+        <div class="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-0">
             @if(session('success'))
                 <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-2xl text-xs sm:text-sm flex items-center space-x-2 shadow-2xs">
                     <span class="text-emerald-700 font-bold">✓</span>
@@ -309,10 +325,32 @@
         </div>
 
         <!-- Main Page Body -->
-        <main class="p-8 flex-grow">
+        <main class="p-4 sm:p-6 lg:p-8 flex-grow">
             @yield('content')
         </main>
     </div>
+
+    <script>
+        (function () {
+            const sidebar = document.getElementById('admin-sidebar');
+            const backdrop = document.getElementById('admin-sidebar-backdrop');
+            const openBtn = document.getElementById('admin-sidebar-open');
+            const closeBtn = document.getElementById('admin-sidebar-close');
+
+            function openSidebar() {
+                sidebar?.classList.remove('-translate-x-full');
+                backdrop?.classList.remove('hidden');
+            }
+            function closeSidebar() {
+                sidebar?.classList.add('-translate-x-full');
+                backdrop?.classList.add('hidden');
+            }
+
+            openBtn?.addEventListener('click', openSidebar);
+            closeBtn?.addEventListener('click', closeSidebar);
+            backdrop?.addEventListener('click', closeSidebar);
+        })();
+    </script>
 
     @stack('scripts')
 </body>
