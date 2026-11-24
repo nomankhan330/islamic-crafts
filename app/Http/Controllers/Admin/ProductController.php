@@ -13,11 +13,11 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'images'])->latest();
+        $query = Product::with(['category', 'images'])->withCount('images')->latest();
 
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(function($q) use ($s) {
+            $query->where(function ($q) use ($s) {
                 $q->where('name', 'like', "%{$s}%")
                   ->orWhere('sku', 'like', "%{$s}%");
             });
@@ -27,10 +27,27 @@ class ProductController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
+        if ($request->filled('status')) {
+            match ($request->status) {
+                'active' => $query->where('is_active', true),
+                'hidden' => $query->where('is_active', false),
+                'featured' => $query->where('is_featured', true),
+                'low_stock' => $query->where('stock', '<=', 5),
+                default => null,
+            };
+        }
+
         $products = $query->paginate(12)->withQueryString();
         $categories = Category::orderBy('name')->get();
 
-        return view('admin.products.index', compact('products', 'categories'));
+        $stats = [
+            'total' => Product::count(),
+            'active' => Product::where('is_active', true)->count(),
+            'featured' => Product::where('is_featured', true)->count(),
+            'low_stock' => Product::where('stock', '<=', 5)->count(),
+        ];
+
+        return view('admin.products.index', compact('products', 'categories', 'stats'));
     }
 
     public function create()

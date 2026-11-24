@@ -10,7 +10,7 @@ class OccasionController extends Controller
 {
     public function index()
     {
-        $occasions = Occasion::orderBy('sort_order')->orderBy('id')->get();
+        $occasions = Occasion::orderBy('sort_order')->orderBy('id')->paginate(8)->withQueryString();
         return view('admin.occasions.index', compact('occasions'));
     }
 

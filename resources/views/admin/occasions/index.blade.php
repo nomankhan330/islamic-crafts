@@ -43,7 +43,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-[#52351E] mb-1.5">Sort Order</label>
-                    <input type="number" name="sort_order" value="{{ old('sort_order', $occasions->count() + 1) }}" min="0" class="w-full bg-[#F5ECE1] border border-[#DFCBB7] rounded-xl px-3.5 py-2.5 text-xs text-[#432C19] outline-none focus:border-[#6B4B32]">
+                    <input type="number" name="sort_order" value="{{ old('sort_order', $occasions->total() + 1) }}" min="0" class="w-full bg-[#F5ECE1] border border-[#DFCBB7] rounded-xl px-3.5 py-2.5 text-xs text-[#432C19] outline-none focus:border-[#6B4B32]">
                 </div>
             </div>
 
@@ -62,7 +62,7 @@
     <!-- Right: Occasions Cards Management (8 cols) -->
     <div class="lg:col-span-8 space-y-4">
         <div class="flex items-center justify-between">
-            <h2 class="font-serif-lux text-2xl font-semibold text-[#4A301A]">Homepage Occasion Cards ({{ $occasions->count() }})</h2>
+            <h2 class="font-serif-lux text-2xl font-semibold text-[#4A301A]">Homepage Occasion Cards ({{ $occasions->total() }})</h2>
             <a href="{{ route('home') }}" target="_blank" class="text-xs font-semibold text-[#6B4B32] hover:underline">Preview on Storefront ↗</a>
         </div>
 
@@ -117,6 +117,10 @@
                     </div>
                 </div>
                 @endforeach
+            </div>
+
+            <div class="mt-6">
+                {{ $occasions->links() }}
             </div>
         @endif
     </div>

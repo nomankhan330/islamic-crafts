@@ -54,7 +54,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-[#52351E] mb-1.5">Sort Order</label>
-                    <input type="number" name="sort_order" value="{{ old('sort_order', $items->count() + 1) }}" min="0" class="w-full bg-[#F5ECE1] border border-[#DFCBB7] rounded-xl px-3 py-2 text-xs text-[#432C19] outline-none">
+                    <input type="number" name="sort_order" value="{{ old('sort_order', $items->total() + 1) }}" min="0" class="w-full bg-[#F5ECE1] border border-[#DFCBB7] rounded-xl px-3 py-2 text-xs text-[#432C19] outline-none">
                 </div>
             </div>
 
@@ -72,7 +72,7 @@
     <!-- Right: Visual Lookbook Gallery Grid (8 cols) -->
     <div class="lg:col-span-8 space-y-4">
         <div class="flex items-center justify-between">
-            <h2 class="font-serif-lux text-2xl font-semibold text-[#4A301A]">Studio Lookbook Photos ({{ $items->count() }})</h2>
+            <h2 class="font-serif-lux text-2xl font-semibold text-[#4A301A]">Studio Lookbook Photos ({{ $items->total() }})</h2>
             <a href="{{ route('home') }}" target="_blank" class="text-xs font-semibold text-[#6B4B32] hover:underline">Preview on Storefront ↗</a>
         </div>
 
@@ -117,6 +117,10 @@
                     </div>
                 </div>
                 @endforeach
+            </div>
+
+            <div class="mt-6">
+                {{ $items->links() }}
             </div>
         @endif
     </div>

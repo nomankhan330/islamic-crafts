@@ -52,7 +52,7 @@
 
     <!-- Right: Categories List (8 cols) -->
     <div class="lg:col-span-8 bg-[#FAF4ED] border border-[#E8DACB] rounded-2xl p-6 shadow-sm">
-        <h2 class="font-serif-lux text-xl font-semibold text-[#4A301A] mb-4">All Active Categories ({{ $categories->count() }})</h2>
+        <h2 class="font-serif-lux text-xl font-semibold text-[#4A301A] mb-4">All Active Categories ({{ $categories->total() }})</h2>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
@@ -87,6 +87,10 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-[#EADBCC]">
+            {{ $categories->links() }}
         </div>
     </div>
 

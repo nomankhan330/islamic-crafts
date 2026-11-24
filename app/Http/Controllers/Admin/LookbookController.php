@@ -11,7 +11,7 @@ class LookbookController extends Controller
 {
     public function index()
     {
-        $items = LookbookItem::orderBy('sort_order')->orderBy('id')->get();
+        $items = LookbookItem::orderBy('sort_order')->orderBy('id')->paginate(9)->withQueryString();
         return view('admin.lookbook.index', compact('items'));
     }
 
