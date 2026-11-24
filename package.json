@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
+        "build": "node -e \"const fs=require('fs');['dist','public/build'].forEach(d=>{if(!fs.existsSync(d))fs.mkdirSync(d,{recursive:true})})\"",
         "dev": "vite"
     },
     "devDependencies": {
