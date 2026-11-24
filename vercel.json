@@ -22,15 +22,20 @@
     }
   ],
   "env": {
+    "APP_NAME": "Islamic Crafts",
     "APP_ENV": "production",
     "APP_DEBUG": "false",
+    "APP_KEY": "base64:UMUasHEZAWgFMEUg1j60HGEdacIcrIdehrQG9EKKYZQ=",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
     "APP_PACKAGES_CACHE": "/tmp/packages.php",
     "APP_ROUTES_CACHE": "/tmp/routes.php",
     "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
+    "DB_CONNECTION": "sqlite",
+    "DB_DATABASE": "/tmp/database.sqlite",
     "CACHE_STORE": "array",
     "SESSION_DRIVER": "cookie",
-    "LOG_CHANNEL": "stderr"
+    "LOG_CHANNEL": "stderr",
+    "WHATSAPP_NUMBER": "923001234567"
   }
 }

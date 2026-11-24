@@ -4,35 +4,30 @@
  * Vercel Serverless Function Handler for Laravel
  */
 
-// If running in Vercel Serverless environment, ensure writable storage paths exist in /tmp
-if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || getenv('VERCEL')) {
-    $writablePaths = [
-        '/tmp/storage/framework/views',
-        '/tmp/storage/framework/cache/data',
-        '/tmp/storage/framework/sessions',
-        '/tmp/storage/logs',
-        '/tmp/storage/app/public',
-        '/tmp/bootstrap/cache',
-    ];
+// Ensure writable storage and cache paths exist in /tmp
+$writablePaths = [
+    '/tmp/storage/framework/views',
+    '/tmp/storage/framework/cache/data',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/logs',
+    '/tmp/storage/app/public',
+    '/tmp/bootstrap/cache',
+];
 
-    foreach ($writablePaths as $path) {
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
-        }
+foreach ($writablePaths as $path) {
+    if (!is_dir($path)) {
+        mkdir($path, 0755, true);
     }
+}
 
-    // If using SQLite on Vercel, copy SQLite file to /tmp if it doesn't already exist
-    $dbConnection = getenv('DB_CONNECTION') ?: ($_ENV['DB_CONNECTION'] ?? '');
-    if ($dbConnection === 'sqlite') {
-        $targetDb = '/tmp/database.sqlite';
-        if (!file_exists($targetDb)) {
-            $sourceDb = __DIR__ . '/../database/database.sqlite';
-            if (file_exists($sourceDb)) {
-                copy($sourceDb, $targetDb);
-            } else {
-                touch($targetDb);
-            }
-        }
+// Ensure SQLite database exists in /tmp
+$targetDb = '/tmp/database.sqlite';
+if (!file_exists($targetDb)) {
+    $sourceDb = __DIR__ . '/../database/database.sqlite';
+    if (file_exists($sourceDb)) {
+        copy($sourceDb, $targetDb);
+    } else {
+        touch($targetDb);
     }
 }
 

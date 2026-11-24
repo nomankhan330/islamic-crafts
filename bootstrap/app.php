@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })->create();
 
 // Support writable storage directory on Vercel Serverless (read-only root filesystem)
-if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || env('VERCEL')) {
+if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || env('VERCEL') || is_dir('/tmp/storage')) {
     $app->useStoragePath('/tmp/storage');
 }
 
