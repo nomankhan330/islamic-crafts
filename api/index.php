@@ -4,9 +4,28 @@
  * Vercel Serverless Function Handler for Laravel
  */
 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+// Force cache and storage paths to /tmp for Vercel Serverless
+$serverlessEnv = [
+    'APP_SERVICES_CACHE' => '/tmp/services.php',
+    'APP_PACKAGES_CACHE' => '/tmp/packages.php',
+    'APP_CONFIG_CACHE' => '/tmp/config.php',
+    'APP_ROUTES_CACHE' => '/tmp/routes-v7.php',
+    'APP_EVENTS_CACHE' => '/tmp/events.php',
+    'VIEW_COMPILED_PATH' => '/tmp/storage/framework/views',
+    'DB_CONNECTION' => 'sqlite',
+    'DB_DATABASE' => '/tmp/database.sqlite',
+    'CACHE_STORE' => 'array',
+    'SESSION_DRIVER' => 'cookie',
+    'LOG_CHANNEL' => 'stderr',
+];
+
+foreach ($serverlessEnv as $key => $val) {
+    if (!getenv($key)) {
+        putenv("{$key}={$val}");
+        $_ENV[$key] = $val;
+        $_SERVER[$key] = $val;
+    }
+}
 
 // Ensure writable storage and cache paths exist in /tmp
 $writablePaths = [
