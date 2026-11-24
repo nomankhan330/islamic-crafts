@@ -119,6 +119,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
 
     // Subscribers
     Route::get('/subscribers', [AdminSubscriberController::class, 'index'])->name('subscribers.index');
+    Route::get('/subscribers/export', [AdminSubscriberController::class, 'export'])->name('subscribers.export');
     Route::delete('/subscribers/{subscriber}', [AdminSubscriberController::class, 'destroy'])->name('subscribers.destroy');
 
     // Shop by Occasion Management
