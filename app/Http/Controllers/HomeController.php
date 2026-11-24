@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\LookbookItem;
+use App\Models\Occasion;
 use App\Models\Product;
 use App\Models\Review;
 use App\Services\CartService;
@@ -35,7 +37,9 @@ class HomeController extends Controller
         }
 
         $approvedReviews = Review::with('product')->where('is_approved', true)->latest()->take(6)->get();
+        $occasions = Occasion::active()->orderBy('sort_order')->orderBy('id')->get();
+        $lookbookItems = LookbookItem::active()->orderBy('sort_order')->orderBy('id')->get();
 
-        return view('home', compact('parentCategories', 'featuredProducts', 'approvedReviews'));
+        return view('home', compact('parentCategories', 'featuredProducts', 'approvedReviews', 'occasions', 'lookbookItems'));
     }
 }

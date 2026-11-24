@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CustomOrderController as AdminCustomOrderController;
+use App\Http\Controllers\Admin\OccasionController as AdminOccasionController;
+use App\Http\Controllers\Admin\LookbookController as AdminLookbookController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SubscriberController as AdminSubscriberController;
 use App\Models\Subscriber;
@@ -118,4 +120,18 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     // Subscribers
     Route::get('/subscribers', [AdminSubscriberController::class, 'index'])->name('subscribers.index');
     Route::delete('/subscribers/{subscriber}', [AdminSubscriberController::class, 'destroy'])->name('subscribers.destroy');
+
+    // Shop by Occasion Management
+    Route::get('/occasions', [AdminOccasionController::class, 'index'])->name('occasions.index');
+    Route::post('/occasions', [AdminOccasionController::class, 'store'])->name('occasions.store');
+    Route::put('/occasions/{occasion}', [AdminOccasionController::class, 'update'])->name('occasions.update');
+    Route::post('/occasions/{occasion}/toggle-active', [AdminOccasionController::class, 'toggleActive'])->name('occasions.toggle-active');
+    Route::delete('/occasions/{occasion}', [AdminOccasionController::class, 'destroy'])->name('occasions.destroy');
+
+    // Studio Lookbook Management ("Crafted in Our Studio, Loved in Your Homes")
+    Route::get('/lookbook', [AdminLookbookController::class, 'index'])->name('lookbook.index');
+    Route::post('/lookbook', [AdminLookbookController::class, 'store'])->name('lookbook.store');
+    Route::put('/lookbook/{lookbookItem}', [AdminLookbookController::class, 'update'])->name('lookbook.update');
+    Route::post('/lookbook/{lookbookItem}/toggle-active', [AdminLookbookController::class, 'toggleActive'])->name('lookbook.toggle-active');
+    Route::delete('/lookbook/{lookbookItem}', [AdminLookbookController::class, 'destroy'])->name('lookbook.destroy');
 });

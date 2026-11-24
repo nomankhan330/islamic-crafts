@@ -492,7 +492,8 @@
     </div>
 </section>
 
-<!-- Shop by Occasion (4 Luxury Gifting Cards) -->
+<!-- Shop by Occasion (Dynamic Admin-Managed Gifting Cards) -->
+@if(isset($occasions) && $occasions->count() > 0)
 <section class="py-12 sm:py-16 bg-[#F6ECE0]/60 border-t border-[#EADBCC]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10">
@@ -502,44 +503,20 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <a href="{{ route('custom-orders', ['category' => 'nikkah']) }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+            @foreach($occasions as $occasion)
+            <a href="{{ $occasion->link_url }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">💍</div>
-                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">Nikkah & Wedding</h3>
-                    <p class="text-xs text-[#7D5A3C] leading-relaxed">Bespoke resin Nikkah platters, pen stands, and personalized guest favors.</p>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">{{ $occasion->icon ?: '✨' }}</div>
+                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">{{ $occasion->title }}</h3>
+                    <p class="text-xs text-[#7D5A3C] leading-relaxed">{{ $occasion->description }}</p>
                 </div>
-                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">Explore Nikkah →</span>
+                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">{{ $occasion->link_text ?: 'Explore' }} →</span>
             </a>
-
-            <a href="{{ route('products.index') }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🌙</div>
-                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">Eid & Ramadan</h3>
-                    <p class="text-xs text-[#7D5A3C] leading-relaxed">Curated festive gift boxes, Quran bookmarks & heartfelt Dua keepsakes.</p>
-                </div>
-                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">Shop Festive Gifts →</span>
-            </a>
-
-            <a href="{{ route('category.show', 'resin-collection') }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🕌</div>
-                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">Home Barakah</h3>
-                    <p class="text-xs text-[#7D5A3C] leading-relaxed">Sacred Bismillah & Ayatul Kursi trays, coasters, and gold-leaf wall art.</p>
-                </div>
-                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">Decorate Home →</span>
-            </a>
-
-            <a href="{{ route('category.show', 'crochet-collection') }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🎀</div>
-                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">Everyday Keepsakes</h3>
-                    <p class="text-xs text-[#7D5A3C] leading-relaxed">Daisy crochet handbags, real-flower resin earrings & aesthetic keychains.</p>
-                </div>
-                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">Browse Accessories →</span>
-            </a>
+            @endforeach
         </div>
     </div>
 </section>
+@endif
 
 <!-- Dark Espresso "The Atelier Difference" Luxury Contrast Showcase -->
 <section class="py-12 sm:py-16 bg-gradient-to-br from-[#4A2E19] via-[#58371E] to-[#38200F] text-[#FAF4ED] relative overflow-hidden">
@@ -575,7 +552,8 @@
     </div>
 </section>
 
-<!-- Instagram Atelier Lookbook Gallery (@islamiccrafts) -->
+<!-- Instagram Atelier Lookbook Gallery (Dynamic Admin-Managed) -->
+@if(isset($lookbookItems) && $lookbookItems->count() > 0)
 <section class="py-12 sm:py-16 bg-[#FAF4ED] border-t border-[#EADBCC]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -589,30 +567,20 @@
             </a>
         </div>
 
-        @php
-            $lookbook = [
-                ['img' => 'images/product-nikkah-platter-hd.jpg', 'caption' => 'Gold Leaf Nikkah Platter'],
-                ['img' => 'images/luxury-resin-tray-hd.jpg', 'caption' => 'Crystal Resin Serving Tray'],
-                ['img' => 'images/product-resin-earrings-hd.jpg', 'caption' => 'Real Pressed Flower Earrings'],
-                ['img' => 'images/crochet-handbag-hd.jpg', 'caption' => 'Daisy Bloom Crochet Tote'],
-                ['img' => 'images/luxury-blush-bouquet-hd.jpg', 'caption' => 'Everlasting Blush Bouquet'],
-                ['img' => 'images/product-resin-keychains-hd.jpg', 'caption' => 'Custom Initial Keychains'],
-            ];
-        @endphp
-
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
-            @foreach($lookbook as $item)
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="group relative aspect-square rounded-2xl overflow-hidden bg-[#F2E7DA] border border-[#E5D4C1] shadow-2xs block">
-                <img src="{{ asset($item['img']) }}" alt="{{ $item['caption'] }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            @foreach($lookbookItems as $item)
+            <a href="{{ $item->link_url ?: 'https://instagram.com' }}" target="_blank" rel="noopener noreferrer" class="group relative aspect-square rounded-2xl overflow-hidden bg-[#F2E7DA] border border-[#E5D4C1] shadow-2xs block">
+                <img src="{{ $item->image_url }}" alt="{{ $item->caption }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                 <div class="absolute inset-0 bg-gradient-to-t from-[#3A2210]/85 via-[#3A2210]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
-                    <span class="text-[11px] font-medium text-[#FAF4ED] leading-tight">{{ $item['caption'] }}</span>
-                    <span class="text-[10px] text-[#DFC4A6] mt-0.5">@islamiccrafts ↗</span>
+                    <span class="text-[11px] font-medium text-[#FAF4ED] leading-tight">{{ $item->caption }}</span>
+                    <span class="text-[10px] text-[#DFC4A6] mt-0.5">{{ $item->handle ?: '@islamiccrafts' }} ↗</span>
                 </div>
             </a>
             @endforeach
         </div>
     </div>
 </section>
+@endif
 
 <!-- Luxury Quick View Modal -->
 <div id="quick-view-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-[#2A180A]/60 backdrop-blur-xs">

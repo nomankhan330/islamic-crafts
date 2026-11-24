@@ -18,10 +18,11 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Categories & Products
+        // 1. Categories, Products & Homepage Showcases
         $this->call([
             CategorySeeder::class,
             ProductSeeder::class,
+            HomepageShowcaseSeeder::class,
         ]);
 
         // 2. Admin User

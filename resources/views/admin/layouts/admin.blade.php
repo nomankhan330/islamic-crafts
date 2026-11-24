@@ -177,6 +177,33 @@
                 </span>
             </a>
 
+            <!-- Homepage Studio CMS Links -->
+            <div class="pt-3 mt-2 border-t border-[#54361C]/50">
+                <p class="px-3.5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B8987A]">Homepage Studio</p>
+
+                <a href="{{ route('admin.occasions.index') }}" 
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.occasions.*') ? 'bg-gradient-to-r from-[#6B4B32] to-[#865F40] text-white shadow-md font-semibold' : 'text-[#DECDBD] hover:bg-[#52351D] hover:text-white' }}">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm">💍</span>
+                        <span>Shop by Occasion</span>
+                    </div>
+                    <span class="text-[10px] bg-[#352010] text-[#D9C4AF] px-2 py-0.5 rounded-full font-mono">
+                        {{ \App\Models\Occasion::count() }}
+                    </span>
+                </a>
+
+                <a href="{{ route('admin.lookbook.index') }}" 
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-200 mt-1 {{ request()->routeIs('admin.lookbook.*') ? 'bg-gradient-to-r from-[#6B4B32] to-[#865F40] text-white shadow-md font-semibold' : 'text-[#DECDBD] hover:bg-[#52351D] hover:text-white' }}">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm">📸</span>
+                        <span>Studio Lookbook</span>
+                    </div>
+                    <span class="text-[10px] bg-[#352010] text-[#D9C4AF] px-2 py-0.5 rounded-full font-mono">
+                        {{ \App\Models\LookbookItem::count() }}
+                    </span>
+                </a>
+            </div>
+
             <!-- Storefront Live Preview Shortcut -->
             <div class="pt-4 mt-4 border-t border-[#54361C]/60">
                 <a href="{{ route('home') }}" target="_blank" class="flex items-center justify-between px-3.5 py-2 rounded-xl text-[#D9C4AF] bg-[#321E0E]/40 hover:bg-[#52351D] hover:text-white transition-all text-xs border border-[#52351D]/60 shadow-inner">
