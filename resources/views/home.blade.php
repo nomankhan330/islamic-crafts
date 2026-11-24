@@ -163,37 +163,63 @@
             </div>
         </div>
 
-        <!-- Left / Right Carousel Navigation Arrows (Decorative like in screenshot) -->
-        <div class="relative">
-            <button class="hidden md:flex absolute -left-5 top-1/2 -translate-y-1/2 z-20 text-[#7D5838] hover:text-[#52351E] p-2 transition-transform hover:-translate-x-1" title="Previous">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <!-- Working Left / Right Carousel Navigation Arrows -->
+        <div class="relative" id="bestsellers-carousel">
+            @if($featuredProducts->count() > 4)
+            <button type="button" id="bestseller-prev-btn" class="hidden md:flex absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#FAF4ED]/95 border border-[#DFCBB7] text-[#7D5838] hover:bg-[#6B4B32] hover:text-white hover:border-[#6B4B32] items-center justify-center shadow-sm transition-all cursor-pointer" title="Previous Bestsellers">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            <button class="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 text-[#7D5838] hover:text-[#52351E] p-2 transition-transform hover:translate-x-1" title="Next">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            <button type="button" id="bestseller-next-btn" class="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#FAF4ED]/95 border border-[#DFCBB7] text-[#7D5838] hover:bg-[#6B4B32] hover:text-white hover:border-[#6B4B32] items-center justify-center shadow-sm transition-all cursor-pointer" title="Next Bestsellers">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             </button>
+            @endif
 
-            <!-- 4 Products Row Exactly from Screenshot: Resin Earrings, Resin Keychains, Nikkah Platter, Crochet Bag -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                @foreach($featuredProducts->take(4) as $product)
-                <div class="product-card rounded-2xl overflow-hidden flex flex-col justify-between group">
+            <!-- Products Grid (4 visible per page, cycles smoothly when arrows clicked) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6" id="bestsellers-grid">
+                @foreach($featuredProducts as $idx => $product)
+                <div class="bestseller-card product-card rounded-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300 {{ $idx >= 4 ? 'hidden' : '' }}" data-page="{{ intdiv($idx, 4) }}">
                     
                     <!-- Product Image Area -->
                     <div class="relative bg-[#F3E8DB] aspect-square flex items-center justify-center overflow-hidden">
-                        @if($product->primary_image_url)
-                            <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                        @else
-                            <div class="flex flex-col items-center justify-center text-center p-4">
-                                <span class="text-4xl mb-2">{{ $product->category->icon ?? '✨' }}</span>
-                                <span class="font-serif-lux italic text-xs text-[#8A6749]">{{ $product->category->name }}</span>
-                            </div>
-                        @endif
+                        <a href="{{ route('products.show', $product->slug) }}" class="block w-full h-full">
+                            @if($product->primary_image_url)
+                                <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            @else
+                                <div class="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                                    <span class="text-4xl mb-2">{{ $product->category->icon ?? '✨' }}</span>
+                                    <span class="font-serif-lux italic text-xs text-[#8A6749]">{{ $product->category->name }}</span>
+                                </div>
+                            @endif
+                        </a>
 
-                        <!-- Heart Wishlist Icon (Top Right) Exactly as in screenshot -->
-                        <button class="absolute top-2.5 right-2.5 text-[#5C3D24] hover:text-rose-500 bg-[#FAF4ED]/70 backdrop-blur-sm p-1.5 rounded-full transition-colors" title="Wishlist">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                            </svg>
-                        </button>
+                        <!-- Floating Action Buttons (Top Right): Wishlist & Quick View -->
+                        <div class="absolute top-2.5 right-2.5 flex flex-col space-y-1.5 z-10">
+                            <button type="button"
+                                    class="wishlist-toggle-btn text-[#5C3D24] hover:text-rose-500 bg-[#FAF4ED]/85 backdrop-blur-sm p-1.5 rounded-full transition-all shadow-2xs hover:scale-110 cursor-pointer"
+                                    data-product-id="{{ $product->id }}"
+                                    data-product-name="{{ $product->name }}"
+                                    title="Save to Wishlist">
+                                <svg class="w-3.5 h-3.5 wishlist-svg" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                            </button>
+
+                            <button type="button"
+                                    class="quick-view-btn text-[#5C3D24] hover:text-[#6B4B32] bg-[#FAF4ED]/85 backdrop-blur-sm p-1.5 rounded-full transition-all shadow-2xs hover:scale-110 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
+                                    data-id="{{ $product->id }}"
+                                    data-name="{{ $product->name }}"
+                                    data-price="Rs. {{ number_format($product->current_price, 0) }}"
+                                    data-category="{{ $product->category->name ?? 'Handcrafted' }}"
+                                    data-image="{{ $product->primary_image_url ?? '' }}"
+                                    data-description="{{ Str::limit(strip_tags($product->short_description ?: $product->description ?: 'Handcrafted with care in our Islamic Crafts studio.'), 150) }}"
+                                    data-url="{{ route('products.show', $product->slug) }}"
+                                    title="Quick View">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Product Details: Title, Price, Add to Cart Button -->
@@ -213,7 +239,7 @@
                         <form action="{{ route('cart.add') }}" method="POST" class="w-full">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <button type="submit" class="w-full btn-luxury py-2 px-3 rounded-xl text-xs font-medium tracking-wide">
+                            <button type="submit" class="w-full btn-luxury py-2 px-3 rounded-xl text-xs font-medium tracking-wide cursor-pointer">
                                 Add to Cart
                             </button>
                         </form>
@@ -221,6 +247,21 @@
 
                 </div>
                 @endforeach
+            </div>
+
+            <!-- Bestsellers Carousel Indicator & View All CTA -->
+            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                @if($featuredProducts->count() > 4)
+                <div class="flex items-center space-x-2" id="bestseller-dots">
+                    @for($p = 0; $p < ceil($featuredProducts->count() / 4); $p++)
+                        <button type="button" data-bpage="{{ $p }}" class="bestseller-dot h-2 rounded-full transition-all duration-300 cursor-pointer {{ $p === 0 ? 'w-6 bg-[#6B4B32]' : 'w-2 bg-[#DECDBD]' }}" aria-label="Page {{ $p + 1 }}"></button>
+                    @endfor
+                </div>
+                @endif
+                <a href="{{ route('products.index') }}" class="inline-flex items-center space-x-2 px-6 py-2.5 rounded-full bg-[#F3E7D9] hover:bg-[#6B4B32] text-[#58381C] hover:text-white border border-[#DEC7AF] text-xs font-semibold transition-all duration-300 shadow-2xs">
+                    <span>View All Handcrafted Pieces</span>
+                    <span>→</span>
+                </a>
             </div>
         </div>
 
@@ -451,10 +492,294 @@
     </div>
 </section>
 
-<!-- Interactive Scripts for Review Slider & Craft Estimator -->
+<!-- Shop by Occasion (4 Luxury Gifting Cards) -->
+<section class="py-12 sm:py-16 bg-[#F6ECE0]/60 border-t border-[#EADBCC]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <span class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9A714C] block mb-1.5">✦ Curated for Every Milestone</span>
+            <h2 class="font-serif-lux italic text-3xl sm:text-4xl text-[#52351E] font-normal">Shop by Occasion</h2>
+            <p class="text-xs text-[#8A6749] mt-1.5">Find the perfect handcrafted keepsake for life's most cherished moments</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <a href="{{ route('custom-orders', ['category' => 'nikkah']) }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">💍</div>
+                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">Nikkah & Wedding</h3>
+                    <p class="text-xs text-[#7D5A3C] leading-relaxed">Bespoke resin Nikkah platters, pen stands, and personalized guest favors.</p>
+                </div>
+                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">Explore Nikkah →</span>
+            </a>
+
+            <a href="{{ route('products.index') }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🌙</div>
+                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">Eid & Ramadan</h3>
+                    <p class="text-xs text-[#7D5A3C] leading-relaxed">Curated festive gift boxes, Quran bookmarks & heartfelt Dua keepsakes.</p>
+                </div>
+                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">Shop Festive Gifts →</span>
+            </a>
+
+            <a href="{{ route('category.show', 'resin-collection') }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🕌</div>
+                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">Home Barakah</h3>
+                    <p class="text-xs text-[#7D5A3C] leading-relaxed">Sacred Bismillah & Ayatul Kursi trays, coasters, and gold-leaf wall art.</p>
+                </div>
+                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">Decorate Home →</span>
+            </a>
+
+            <a href="{{ route('category.show', 'crochet-collection') }}" class="group rounded-3xl bg-[#FAF4ED] border border-[#E4D1BD] p-6 hover:border-[#C2A07E] hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4DFC8] to-[#E8CCB0] border border-[#DCBF9F] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🎀</div>
+                    <h3 class="font-serif-lux text-2xl text-[#4A2D16] font-medium mb-1">Everyday Keepsakes</h3>
+                    <p class="text-xs text-[#7D5A3C] leading-relaxed">Daisy crochet handbags, real-flower resin earrings & aesthetic keychains.</p>
+                </div>
+                <span class="mt-5 inline-flex items-center text-xs font-semibold text-[#6B4B32] group-hover:translate-x-1 transition-transform">Browse Accessories →</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Dark Espresso "The Atelier Difference" Luxury Contrast Showcase -->
+<section class="py-12 sm:py-16 bg-gradient-to-br from-[#4A2E19] via-[#58371E] to-[#38200F] text-[#FAF4ED] relative overflow-hidden">
+    <div class="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#C6A47E]/15 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#C6A47E]/10 blur-3xl"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <span class="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#DFC4A6] block mb-2">✦ The Islamic Crafts Promise</span>
+            <h2 class="font-serif-lux italic text-3xl sm:text-4xl text-[#FDF8F1] font-normal mb-2">Why Families Trust Our Atelier</h2>
+            <p class="text-xs sm:text-sm text-[#D9C2A8]">Every detail is thoughtfully crafted so your gift arrives with timeless beauty and lasting durability.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="rounded-3xl bg-[#FAF4ED]/8 border border-[#DFCBB7]/20 p-6 sm:p-7 backdrop-blur-xs hover:bg-[#FAF4ED]/12 transition-all">
+                <span class="inline-flex w-11 h-11 rounded-2xl bg-[#C6A47E]/20 border border-[#C6A47E]/30 items-center justify-center text-xl mb-4">💎</span>
+                <h3 class="font-serif-lux text-2xl text-[#FDF8F1] font-medium mb-2">Non-Yellowing Crystal Resin</h3>
+                <p class="text-xs text-[#D9C2A8] leading-relaxed">We use imported UV-resistant luxury epoxy resin with genuine 24k gold-leaf flakes and real hand-pressed florals.</p>
+            </div>
+
+            <div class="rounded-3xl bg-[#FAF4ED]/8 border border-[#DFCBB7]/20 p-6 sm:p-7 backdrop-blur-xs hover:bg-[#FAF4ED]/12 transition-all">
+                <span class="inline-flex w-11 h-11 rounded-2xl bg-[#C6A47E]/20 border border-[#C6A47E]/30 items-center justify-center text-xl mb-4">📱</span>
+                <h3 class="font-serif-lux text-2xl text-[#FDF8F1] font-medium mb-2">WhatsApp Preview Before Pour</h3>
+                <p class="text-xs text-[#D9C2A8] leading-relaxed">On personalized platters & calligraphy frames, our artisan shares a digital layout preview on WhatsApp for your approval first.</p>
+            </div>
+
+            <div class="rounded-3xl bg-[#FAF4ED]/8 border border-[#DFCBB7]/20 p-6 sm:p-7 backdrop-blur-xs hover:bg-[#FAF4ED]/12 transition-all">
+                <span class="inline-flex w-11 h-11 rounded-2xl bg-[#C6A47E]/20 border border-[#C6A47E]/30 items-center justify-center text-xl mb-4">🎁</span>
+                <h3 class="font-serif-lux text-2xl text-[#FDF8F1] font-medium mb-2">Fragile Gift-Ready Packaging</h3>
+                <p class="text-xs text-[#D9C2A8] leading-relaxed">Multi-layer bubble cushioning tucked inside our aesthetic gifting boxes — ready to present straight out of the parcel.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Instagram Atelier Lookbook Gallery (@islamiccrafts) -->
+<section class="py-12 sm:py-16 bg-[#FAF4ED] border-t border-[#EADBCC]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+                <span class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9A714C] block mb-1">✦ Behind The Scenes</span>
+                <h2 class="font-serif-lux italic text-3xl sm:text-4xl text-[#52351E] font-normal">Crafted in Our Studio, Loved in Your Homes</h2>
+            </div>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 px-5 py-2.5 rounded-full bg-[#F3E7D9] hover:bg-[#6B4B32] text-[#58381C] hover:text-white border border-[#DEC7AF] text-xs font-semibold transition-all self-start sm:self-auto">
+                <span>📸 Follow @islamiccrafts</span>
+                <span>↗</span>
+            </a>
+        </div>
+
+        @php
+            $lookbook = [
+                ['img' => 'images/product-nikkah-platter-hd.jpg', 'caption' => 'Gold Leaf Nikkah Platter'],
+                ['img' => 'images/luxury-resin-tray-hd.jpg', 'caption' => 'Crystal Resin Serving Tray'],
+                ['img' => 'images/product-resin-earrings-hd.jpg', 'caption' => 'Real Pressed Flower Earrings'],
+                ['img' => 'images/crochet-handbag-hd.jpg', 'caption' => 'Daisy Bloom Crochet Tote'],
+                ['img' => 'images/luxury-blush-bouquet-hd.jpg', 'caption' => 'Everlasting Blush Bouquet'],
+                ['img' => 'images/product-resin-keychains-hd.jpg', 'caption' => 'Custom Initial Keychains'],
+            ];
+        @endphp
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+            @foreach($lookbook as $item)
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="group relative aspect-square rounded-2xl overflow-hidden bg-[#F2E7DA] border border-[#E5D4C1] shadow-2xs block">
+                <img src="{{ asset($item['img']) }}" alt="{{ $item['caption'] }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#3A2210]/85 via-[#3A2210]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                    <span class="text-[11px] font-medium text-[#FAF4ED] leading-tight">{{ $item['caption'] }}</span>
+                    <span class="text-[10px] text-[#DFC4A6] mt-0.5">@islamiccrafts ↗</span>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<!-- Luxury Quick View Modal -->
+<div id="quick-view-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-[#2A180A]/60 backdrop-blur-xs">
+    <div class="relative w-full max-w-2xl rounded-[2rem] bg-[#FAF4ED] border border-[#DFCBB7] shadow-2xl overflow-hidden animate-fadeIn">
+        <button type="button" id="qv-close-btn" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-[#FAF4ED]/90 hover:bg-[#6B4B32] text-[#58381C] hover:text-white border border-[#DECDBD] flex items-center justify-center text-lg transition-colors cursor-pointer" title="Close">
+            ×
+        </button>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2">
+            <div class="bg-[#F2E7DA] aspect-square flex items-center justify-center overflow-hidden">
+                <img id="qv-image" src="" alt="" class="w-full h-full object-cover">
+            </div>
+            <div class="p-6 sm:p-7 flex flex-col justify-between">
+                <div>
+                    <span id="qv-category" class="inline-block px-3 py-1 rounded-full bg-[#F2E5D5] text-[#7D5838] text-[10px] font-semibold uppercase tracking-wider mb-3"></span>
+                    <h3 id="qv-name" class="font-serif-lux text-2xl sm:text-3xl text-[#4A2D16] font-medium leading-tight mb-2"></h3>
+                    <p id="qv-price" class="text-lg font-semibold text-[#6B4B32] mb-3"></p>
+                    <p id="qv-description" class="text-xs text-[#7D5A3C] leading-relaxed mb-5"></p>
+                </div>
+
+                <div class="space-y-2.5">
+                    <form action="{{ route('cart.add') }}" method="POST" id="qv-cart-form">
+                        @csrf
+                        <input type="hidden" name="product_id" id="qv-product-id" value="">
+                        <button type="submit" class="w-full btn-luxury py-3 px-5 rounded-full text-xs font-semibold tracking-wide cursor-pointer shadow-sm">
+                            Add to Shopping Bag ♡
+                        </button>
+                    </form>
+                    <a id="qv-details-link" href="#" class="w-full inline-flex items-center justify-center py-2.5 px-5 rounded-full bg-[#F3E7D9] hover:bg-[#E7D3BC] text-[#58381C] border border-[#DEC7AF] text-xs font-semibold transition-all">
+                        View Full Details & Gallery →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Scripts for Review Slider, Craft Estimator, Bestsellers Carousel, Wishlist & Quick View -->
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // --- 0. Working Bestsellers Carousel ---
+        const bestsellerCards = document.querySelectorAll('.bestseller-card');
+        const bestsellerDots = document.querySelectorAll('.bestseller-dot');
+        const bsPrevBtn = document.getElementById('bestseller-prev-btn');
+        const bsNextBtn = document.getElementById('bestseller-next-btn');
+        const totalBsPages = Math.max(1, Math.ceil(bestsellerCards.length / 4));
+        let currentBsPage = 0;
+
+        function showBestsellerPage(pageIndex) {
+            currentBsPage = (pageIndex + totalBsPages) % totalBsPages;
+            bestsellerCards.forEach(card => {
+                const cardPage = parseInt(card.getAttribute('data-page'), 10);
+                if (cardPage === currentBsPage) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            bestsellerDots.forEach(dot => {
+                const dotPage = parseInt(dot.getAttribute('data-bpage'), 10);
+                if (dotPage === currentBsPage) {
+                    dot.classList.remove('w-2', 'bg-[#DECDBD]');
+                    dot.classList.add('w-6', 'bg-[#6B4B32]');
+                } else {
+                    dot.classList.remove('w-6', 'bg-[#6B4B32]');
+                    dot.classList.add('w-2', 'bg-[#DECDBD]');
+                }
+            });
+        }
+
+        if (bsPrevBtn) bsPrevBtn.addEventListener('click', () => showBestsellerPage(currentBsPage - 1));
+        if (bsNextBtn) bsNextBtn.addEventListener('click', () => showBestsellerPage(currentBsPage + 1));
+        bestsellerDots.forEach(dot => {
+            dot.addEventListener('click', () => showBestsellerPage(parseInt(dot.getAttribute('data-bpage'), 10)));
+        });
+
+        // --- 0b. Working Wishlist Toggle (localStorage + Toast) ---
+        let savedWishlist = [];
+        try {
+            savedWishlist = JSON.parse(localStorage.getItem('ic_wishlist') || '[]');
+        } catch (e) { savedWishlist = []; }
+
+        const wishlistBtns = document.querySelectorAll('.wishlist-toggle-btn');
+        function renderWishlistState(btn, isSaved) {
+            const svg = btn.querySelector('.wishlist-svg');
+            if (isSaved) {
+                btn.classList.add('text-rose-500');
+                btn.classList.remove('text-[#5C3D24]');
+                if (svg) svg.setAttribute('fill', 'currentColor');
+            } else {
+                btn.classList.remove('text-rose-500');
+                btn.classList.add('text-[#5C3D24]');
+                if (svg) svg.setAttribute('fill', 'none');
+            }
+        }
+
+        wishlistBtns.forEach(btn => {
+            const pid = btn.getAttribute('data-product-id');
+            const pname = btn.getAttribute('data-product-name');
+            renderWishlistState(btn, savedWishlist.includes(pid));
+
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const exists = savedWishlist.includes(pid);
+                if (exists) {
+                    savedWishlist = savedWishlist.filter(id => id !== pid);
+                    renderWishlistState(btn, false);
+                    if (typeof window.showNoticeToast === 'function') {
+                        window.showNoticeToast('Removed from Wishlist', `${pname} removed from your favorites.`, '🤍');
+                    }
+                } else {
+                    savedWishlist.push(pid);
+                    renderWishlistState(btn, true);
+                    if (typeof window.showNoticeToast === 'function') {
+                        window.showNoticeToast('Saved to Wishlist ♡', `${pname} added to your favorites!`, '❤️');
+                    }
+                }
+                try { localStorage.setItem('ic_wishlist', JSON.stringify(savedWishlist)); } catch (err) {}
+            });
+        });
+
+        // --- 0c. Quick View Modal ---
+        const qvModal = document.getElementById('quick-view-modal');
+        const qvCloseBtn = document.getElementById('qv-close-btn');
+        const qvImg = document.getElementById('qv-image');
+        const qvCategory = document.getElementById('qv-category');
+        const qvName = document.getElementById('qv-name');
+        const qvPrice = document.getElementById('qv-price');
+        const qvDesc = document.getElementById('qv-description');
+        const qvProductId = document.getElementById('qv-product-id');
+        const qvDetailsLink = document.getElementById('qv-details-link');
+
+        function closeQuickView() {
+            if (!qvModal) return;
+            qvModal.classList.add('hidden');
+            qvModal.classList.remove('flex');
+        }
+
+        document.querySelectorAll('.quick-view-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (!qvModal) return;
+                qvImg.src = this.dataset.image || '';
+                qvImg.alt = this.dataset.name || '';
+                qvCategory.textContent = this.dataset.category || 'Handcrafted';
+                qvName.textContent = this.dataset.name || '';
+                qvPrice.textContent = this.dataset.price || '';
+                qvDesc.textContent = this.dataset.description || '';
+                qvProductId.value = this.dataset.id || '';
+                qvDetailsLink.href = this.dataset.url || '#';
+
+                qvModal.classList.remove('hidden');
+                qvModal.classList.add('flex');
+            });
+        });
+
+        if (qvCloseBtn) qvCloseBtn.addEventListener('click', closeQuickView);
+        if (qvModal) {
+            qvModal.addEventListener('click', function (e) {
+                if (e.target === qvModal) closeQuickView();
+            });
+        }
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeQuickView();
+        });
+
         // --- 1. Customer Reviews Carousel ---
         const slides = document.querySelectorAll('.review-slide');
         const dots = document.querySelectorAll('#review-dots button');

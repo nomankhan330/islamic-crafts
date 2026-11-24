@@ -24,9 +24,13 @@ class HomeController extends Controller
             })
             ->values();
 
-        // Fallback if less than 4
-        if ($featuredProducts->count() < 4) {
-            $extra = Product::active()->featured()->with(['images', 'category', 'reviews'])->take(4)->get();
+        // Add additional active products (up to 8 total) for interactive Bestsellers carousel
+        if ($featuredProducts->count() < 8) {
+            $extra = Product::active()
+                ->with(['images', 'category', 'reviews'])
+                ->whereNotIn('id', $featuredProducts->pluck('id'))
+                ->take(8 - $featuredProducts->count())
+                ->get();
             $featuredProducts = $featuredProducts->merge($extra)->unique('id')->values();
         }
 
