@@ -4,6 +4,10 @@
  * Vercel Serverless Function Handler for Laravel
  */
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 // Ensure writable storage and cache paths exist in /tmp
 $writablePaths = [
     '/tmp/storage/framework/views',
@@ -31,5 +35,12 @@ if (!file_exists($targetDb)) {
     }
 }
 
-// Forward the request to standard Laravel public/index.php
-require __DIR__ . '/../public/index.php';
+try {
+    require __DIR__ . '/../public/index.php';
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo "<h1>Unhandled Server Error</h1>";
+    echo "<p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<p><strong>File:</strong> " . htmlspecialchars($e->getFile()) . ":" . $e->getLine() . "</p>";
+    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+}
