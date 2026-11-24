@@ -18,10 +18,11 @@ class OrderController extends Controller
 
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(function($q) use ($s) {
+            $query->where(function ($q) use ($s) {
                 $q->where('order_number', 'like', "%{$s}%")
                   ->orWhere('customer_name', 'like', "%{$s}%")
-                  ->orWhere('customer_phone', 'like', "%{$s}%");
+                  ->orWhere('customer_phone', 'like', "%{$s}%")
+                  ->orWhere('city', 'like', "%{$s}%");
             });
         }
 
@@ -36,7 +37,40 @@ class OrderController extends Controller
             'cancelled' => Order::where('status', 'cancelled')->count(),
         ];
 
-        return view('admin.orders.index', compact('orders', 'counts'));
+        $totalRevenue = Order::where('status', '!=', 'cancelled')->sum('total_amount');
+
+        return view('admin.orders.index', compact('orders', 'counts', 'totalRevenue'));
+    }
+
+    public function export()
+    {
+        $orders = Order::with('items')->latest()->get();
+        $filename = 'islamic-crafts-orders-' . now()->format('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($orders) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Order #', 'Customer', 'Phone', 'City', 'Items', 'Total (Rs)', 'Status', 'Placed On']);
+            foreach ($orders as $order) {
+                fputcsv($handle, [
+                    $order->order_number,
+                    $order->customer_name,
+                    $order->customer_phone,
+                    $order->city,
+                    $order->items->sum('quantity'),
+                    $order->total_amount,
+                    ucfirst($order->status),
+                    $order->created_at ? $order->created_at->format('Y-m-d H:i') : '',
+                ]);
+            }
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function show(Order $order)
