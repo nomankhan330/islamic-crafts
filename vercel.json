@@ -17,6 +17,7 @@
   "env": {
     "APP_NAME": "Islamic Crafts",
     "APP_ENV": "production",
+    "APP_URL": "https://islamic-crafts.vercel.app",
     "APP_DEBUG": "false",
     "APP_KEY": "base64:UMUasHEZAWgFMEUg1j60HGEdacIcrIdehrQG9EKKYZQ=",
     "APP_SERVICES_CACHE": "/tmp/services.php",
